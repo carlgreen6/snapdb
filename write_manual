@@ -1,0 +1,43 @@
+#!/usr/bin/python3
+# Writes manual entries to a specified database and table.
+# Edit history: CK created 20170809.
+
+import subprocess
+import sys
+
+if len(sys.argv)-1 != 2:
+    print('USAGE: ./write_manual <database_name> <table_name>')
+    exit()
+
+db = sys.argv[1]
+table = sys.argv[2]
+cwd = str(subprocess.check_output("pwd"))
+pathtofile = cwd[2:-3] + '/' + db + '/' + table + '.sdb'
+
+f = open(pathtofile,'r')
+text = []
+for line in f:
+    text.append(line)
+split_headers = text[0].strip('\n').split(',')
+outstate = 'Table %s/%s selected. Please enter the following information as prompted. To leave a field blank, simply hit enter.'%(db,table)
+print(outstate)
+status = 'y'
+counter = 0
+while status != 'n':
+    counter += 1
+    newline = ''
+    for field in split_headers:
+        prompt = '%s: '%(field)
+        entry = input(prompt)
+        newline = newline + ',' + entry
+    newline += '\n'
+    text.append(newline[1:])
+    status = input('Would you like to make another entry? (y/n) ')
+
+g = open(pathtofile,'w')
+for line in text:
+    g.write(line)
+
+exstr = '%d record(s) successfully added to table %s/%s.'%(counter,db,table)
+    
+print(exstr)

@@ -1,0 +1,33 @@
+#!/bin/bash
+# Creates a place to store data.
+# Edit history: CK created 20170807.
+
+if [ "$#" -ne 1 ]; then
+    echo "USAGE: ./add_table <database_name>"
+    exit
+fi
+
+echo "Tables are where different aspects of your data are stored. Let's start by naming the table."
+read -p "What do you want your table to be called? " tab_name
+
+while true; do
+    read -p "Did you enter the correct name? (y/n) " yn
+    case $yn in
+	[Yy]* ) if [ -e "$tab_name" ]; then echo "Table $tab_name already exists in database $1. Remove it first using remove_table before creating a new one with the same name."; exit; else touch "$1"/"$tab_name".sdb; break; fi;;
+	[Nn]* ) read -p "What do you want your table to be called?" tab_name;;
+	* ) echo "Please answer y/n. ";;
+    esac
+done
+
+echo "Now we need to make the column headers for the table. We will enter these one at a time. "
+column=""
+while true; do
+    read -p "Enter a column header (no spaces). To exit, enter q. Column name: " col_head
+    case $col_head in
+	q ) break;;
+	* ) if [ "$column" == "" ]; then column="$col_head"; else column="$column,$col_head"; fi;;
+    esac
+done
+
+echo "$column" >> "$1"/"$tab_name".sdb
+echo "Table $1/$tab_name created successfully."

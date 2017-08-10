@@ -1,0 +1,19 @@
+#!/bin/bash
+# Removes a simpledb. Data cannot be recovered once the remove has been completed.
+# Edit history: CK created 20170807.
+
+if [ "$#" -ne 1 ]; then
+    echo "USAGE: ./remove_db <database_name>"
+    exit
+fi
+
+while true; do
+    read -p "Are you sure you want to remove the database $1? (y/n) " yn
+    case $yn in
+	[Yy]* ) read -sp "Please enter your database key: " dbkey; echo; if [ $(head -n 1 "$1/dbkey.txt") == "$dbkey" ]; then rm -r $1; break; else echo "Database key does not match input. Please try again."; exit; fi;;
+	[Nn]* ) echo "Database not removed. "; exit;;
+	* ) echo "Please answer y/n. ";;
+    esac
+done
+
+echo "Database $1 successfully removed. "

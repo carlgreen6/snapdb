@@ -1,0 +1,58 @@
+#!/usr/bin/python3
+# Deletes the lines in the specified file from the specified table in the specified database
+# Edit history: CK created 20170810.
+
+import sys
+import subprocess
+from getpass import getpass
+
+if len(sys.argv)-1 != 3:
+    print('USAGE: ./delete_from_file <database_name> <table_name> <path_to_file>')
+    print('DO NOT INCLUDE THE HEADERS IN THE FILE OF LINES TO BE DELETED. NOTE: the lines to be deleted must be comma separated.')
+    exit()
+
+db = sys.argv[1]
+table = sys.argv[2]
+del_filename = sys.argv[3]
+
+cwd = str(subprocess.check_output("pwd"))
+filename = cwd[2:-3] + '/' + db + '/' + table + '.sdb'
+
+dbkeyfilename = cwd[2:-3] + '/' + db + '/dbkey.txt'
+ps = open(dbkeyfilename,'r')
+for line in ps:
+    dbkey = line.strip('\n')
+    break
+#print('WARNING: DO NOT INCLUDE HEADERS IN YOUR FILE OF LINES TO DELETE. IF YOU HAVE DONE SO, EXIT NOW.')
+inkey = getpass('Enter the database key: ')
+if inkey != dbkey:
+    print('Incorrect database key.')
+    exit()
+
+df = open(del_filename,'r')
+tbd = []
+for line in df:
+    tbd.append(line)
+
+for del_line in tbd:
+    del_line.strip('\n')
+    del_line += '\n'
+    towrite = []
+    f = open(filename,'r')
+    for line in f:
+        towrite.append(line)
+    f.close()
+    if del_line.strip('\n') != towrite[0].strip('\n'):
+        g = open(filename,'w')
+        written = []
+        for line in towrite:
+            if line.strip('\n') != del_line.strip('\n'):
+                written.append(line)
+                g.write(line)
+        g.close()
+        if len(written) < len(towrite):
+            exit_status = 'Line "%s" successfully deleted from table %s/%s.'%(del_line[:-2],db,table)
+            print(exit_status)
+        else:
+            exit_status = '%s: File unaltered.'%(del_line.strip('\n'))
+            print(exit_status)

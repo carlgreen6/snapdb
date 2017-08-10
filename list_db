@@ -1,0 +1,3 @@
+#!/bin/bash
+
+ls -d */ | grep -v backup_storage

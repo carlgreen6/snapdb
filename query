@@ -1,0 +1,10 @@
+#!/bin/bash
+# Searches a given db and table for the given string.
+# Edit history: CK created 20170809.
+
+if [ "$#" -ne 3 ]; then
+    echo -e "USAGE: ./query <database_name> <table_name> \"Query\"\nAn empty string denotes listing the whole table."
+    exit
+fi
+
+grep --color "$3" ./"$1"/"$2".sdb

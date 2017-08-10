@@ -1,0 +1,24 @@
+#!/bin/bash
+# Removes the specified table from the specified database.
+# Edit history: CK created 20170807.
+
+if [ "$#" -ne 2 ]; then
+    echo "USAGE: ./remove_table <database_name> <table_name>"
+    exit
+fi
+
+if [ -e "$1"/"$2".sdb ]; then
+    while true; do
+	read -p "Are you sure you want to remove the table $1/$2? (y/n) " yn
+	case $yn in
+	    [Yy]* ) read -sp "Please enter your database key: " dbkey; echo; if [ $(head -n 1 "$1/dbkey.txt") == "$dbkey" ]; then rm "$1"/"$2".sdb; break; else "Database key does not match input. Please try again."; exit; fi;;
+	    [Nn]* ) echo "Table not removed. "; exit;;
+	    * ) echo "Please answer y/n. ";;
+	esac
+    done
+else
+    echo "The table $1/$2 does not exist. "
+    exit
+fi
+
+echo "Table $1/$2 successfully removed. "

@@ -1,0 +1,15 @@
+#!/bin/bash
+# Makes a backup of the specified database.
+# CK created 20170809.
+
+if [ ! -d ./backup_storage ]; then 
+    mkdir backup_storage
+fi    
+
+if [ "$#" -ne 1 ]; then
+    echo -e "USAGE: ./backup <database_name>\nRecommended usage is with crontab and list_db."
+    exit
+fi
+
+DATETIME=`date '+%Y%m%d%H%M%S'`
+zip -r ./backup_storage/"$1"_"$DATETIME".zip "$1"

@@ -1,0 +1,24 @@
+#!/bin/bash
+# Reverts the proper database to the specified file.
+
+if [ "$#" -ne 1 ]; then
+    echo "USAGE: ./revert ./backup_storage/<backup_file>.zip"
+    exit
+fi
+
+
+fname=$(echo $1 | awk -F/ '{print $3}')
+DB=$(echo $fname | awk 'BEGIN{FS=OFS="_"}{$NF=""; NF--; print}')
+
+echo "WARNING: Reverting a database will cause all changes made since the specified backup was created to be lost. It is recommended that you make a backup of the database before you revert."
+
+while true; do
+    read -p "Are you sure you want to revert the database $DB to the specified file? (y/n) " yn
+    case $yn in
+	[Yy]* ) read -sp "Please enter your database key: " dbkey; echo; if [ $(head -n 1 "$DB/dbkey.txt") == "$dbkey" ]; then rm -r "$DB"; unzip "$1"; break; else echo "Database key does not match input. Please try again."; exit; fi;;
+	[Nn]* ) echo "Database not reverted. "; exit;;
+	* ) echo "Please answer y/n. ";;
+    esac
+done
+
+echo -e "\nDatabase $DB successfully reverted."

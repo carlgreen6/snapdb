@@ -1,0 +1,10 @@
+#!/bin/bash
+# Lists all tables in the specified database.
+# Edit history CK created 20170807.
+
+if [ "$#" -ne 1 ]; then
+    echo "USAGE: ./list_tables <database_name>"
+    exit
+fi
+
+ls $1 | grep .sdb | awk -F "." '{print $1}'

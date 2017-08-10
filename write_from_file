@@ -1,0 +1,66 @@
+#!/usr/bin/python3
+# Writes the specified file to the specified table of the specified database
+# Edit history: CK created 20170810.
+
+import sys
+import subprocess
+
+if len(sys.argv)-1 != 3:
+    print('Usage: ./write_from_file <database_name> <table_name> <path_to_file>')
+    print('Ensure that your file is tab, comma, or space separated.')
+    exit()
+
+db = sys.argv[1]
+table = sys.argv[2]
+filename = sys.argv[3]
+
+cwd = str(subprocess.check_output("pwd"))
+tablefilename = cwd[2:-3] + '/' + db + '/' + table + '.sdb'
+
+# Read in input file
+f = open(filename,'r')
+ftext = []
+for line in f:
+    ftext.append(line)
+
+# Get headers
+g = open(tablefilename,'r')
+for line in g:
+    hdrs = line
+    break
+
+headers = hdrs.strip('\n').split(',')
+if len(headers) > 1 and sum([1 if headers[k] in ftext[0] else 0 for k in range(len(headers))]) == len(headers):
+    # find delimiting character
+    first_word = headers[0]
+    second_word = headers[1]
+    inheadminusfirstword = ftext[0][len(first_word):]
+    delim = inheadminusfirstword[0]
+    tt = 1
+    while second_word != inheadminusfirstword[tt:tt + len(second_word)]:
+        tt += 1
+        delim += inheadminusfirstword[tt]
+    towrite = []
+    for line in ftext:
+        if line != ftext[0]:
+            com = ','
+            spline = line.split(delim)
+            writer = com.join(spline)
+            if writer[len(writer) - 1] != '\n':
+                writer += '\n'
+            towrite.append(writer)
+    h = open(tablefilename,'a')
+    for line in towrite:
+        h.write(line)
+elif headers[0] in ftext[0]:
+    h = open(tablefilename,'a')
+    for line in ftext:
+        if line[len(line)-1] != '\n':
+            line += '\n'
+        h.write(line)
+else:
+     print('Column headers do not match those in the selected table. List the table''s column headers using ./list_headers <database_name> <table_name>')
+     exit()
+exit_state = 'File %s successfully written to table %s/%s'%(filename,db,table)
+
+print(exit_state)

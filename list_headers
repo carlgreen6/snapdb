@@ -1,0 +1,26 @@
+#!/usr/bin/python3
+# Lists the headers of the specified table in the specified database.
+# Edit history: CK created 20170810.
+
+import sys
+import subprocess
+
+if len(sys.argv)-1 != 2:
+    print('USAGE: ./list_headers <database_name> <table_name>')
+    exit()
+
+db = sys.argv[1]
+table = sys.argv[2]
+
+cwd = str(subprocess.check_output("pwd"))
+filename = cwd[2:-3] + '/' + db + '/' + table + '.sdb'
+
+f = open(filename,'r')
+for line in f:
+    headers = line
+    break
+
+print('Headers:')
+
+for hdr in headers.strip('\n').split(','):
+    print(hdr)
